@@ -1,6 +1,6 @@
 # Crochê Conversor
 
-Base inicial de uma aplicação React para traduzir informações comuns em etiquetas de fios brasileiros — principalmente TEX, peso e metragem — para categorias usadas em receitas internacionais, como DK, Worsted e Sport.
+Aplicação React para traduzir informações comuns em etiquetas de fios brasileiros — principalmente TEX, peso e metragem — para categorias usadas em receitas internacionais, como DK, Worsted e Sport, e também fazer a conversão inversa.
 
 > **Status:** protótipo funcional / fundação do projeto.
 
@@ -23,7 +23,7 @@ Base inicial de uma aplicação React para traduzir informações comuns em etiq
 
 ## Rodando localmente
 
-Na pasta `D:\projetinhos\crochet-conversor`:
+Na pasta `D:\projetinhos\crochet-conversor\crochet-conversor`:
 
 ```bash
 npm install
@@ -74,13 +74,21 @@ A tela inicial permite:
 
 - converter TEX em metros por 100 g;
 - calcular TEX a partir de peso + metragem;
-- obter uma categoria internacional preliminar;
+- obter uma categoria internacional aproximada;
+- selecionar uma categoria internacional e consultar faixas aproximadas de TEX
+  e metros por 100 g;
 - visualizar CYC, TEX e metros por 100 g no resultado;
+- identificar zonas de transição e categorias adjacentes;
 - alternar entre modos usando controles acessíveis por teclado.
 
 ## Atenção sobre a classificação
 
-As faixas de categorias em `src/domain/yarn/categories.ts` são **preliminares**. Elas existem para permitir construir e testar o fluxo do produto. Antes de publicar a ferramenta, precisamos validar as faixas com fontes técnicas confiáveis e uma amostra de fios brasileiros reais.
+As faixas de categorias em `src/domain/yarn/categories.ts` são uma heurística
+operacional validada para o MVP, não uma equivalência normativa. O critério,
+as fontes e os limites da tabela estão em
+[`docs/tabela-categorias.md`](./docs/tabela-categorias.md). Ainda é necessário
+calibrá-la com uma amostra de fios brasileiros reais antes de recomendações
+comerciais.
 
 ## Documentação
 
@@ -90,13 +98,12 @@ As faixas de categorias em `src/domain/yarn/categories.ts` são **preliminares**
 - [Registro de decisões](./docs/decisoes.md)
 - [Progresso de implementação](./docs/progresso.md)
 - [Especificação do produto](./docs/produto.md)
+- [Tabela-base e fontes](./docs/tabela-categorias.md)
 
 ## Próximos passos sugeridos
 
-1. Validar e calibrar a tabela de categorias.
+1. Calibrar a tabela com fios brasileiros reais, especialmente CYC 6–7.
 2. Definir nome e logo finais.
 3. Escolher as fontes definitivas e conferir suas licenças.
-4. Adicionar zonas de transição entre categorias.
-5. Adicionar conversão inversa: categoria → faixa aproximada.
-6. Incluir jardas ↔ metros e onças ↔ gramas.
-7. Criar testes de componentes e auditoria automática de acessibilidade.
+4. Incluir jardas ↔ metros e onças ↔ gramas.
+5. Criar testes de componentes e auditoria automática de acessibilidade.

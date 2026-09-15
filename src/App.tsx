@@ -27,7 +27,7 @@ function App() {
                 Qual fio brasileiro combina com a sua receita?
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 sm:text-xl">
-                Converta TEX, peso e metragem para categorias usadas em receitas internacionais, como DK, Worsted e Sport.
+                Converta TEX, peso e metragem para categorias internacionais — ou faça o caminho inverso e descubra qual faixa procurar.
               </p>
             </div>
 
@@ -48,7 +48,7 @@ function App() {
               {[
                 ['1', 'Veja a etiqueta', 'Encontre o TEX ou o peso e a metragem do novelo.'],
                 ['2', 'Digite os dados', 'A ferramenta normaliza as informações para metros por 100 g.'],
-                ['3', 'Compare a categoria', 'Você recebe uma estimativa de categoria e os números usados no cálculo.'],
+                ['3', 'Compare com a receita', 'Veja a categoria ou a faixa aproximada de TEX, sempre conferindo a amostra.'],
               ].map(([number, title, text]) => (
                 <li key={number} className="rounded-[2rem] border-2 border-brand-charcoal bg-brand-cream p-6">
                   <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-lilac text-lg font-black" aria-hidden="true">
@@ -65,9 +65,9 @@ function App() {
 
       <footer className="bg-brand-charcoal text-brand-cream">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-8 text-sm sm:px-6 lg:px-8">
-          <p className="font-bold">Crochê Conversor — base inicial do projeto.</p>
+          <p className="font-bold">Crochê Conversor — traduza os dois lados da etiqueta.</p>
           <p className="max-w-2xl text-brand-cream/80">
-            As categorias exibidas no protótipo são estimativas preliminares e serão calibradas antes do lançamento.
+            As faixas são referências aproximadas, não equivalências absolutas. Sempre confira a amostra indicada na receita.
           </p>
         </div>
       </footer>
