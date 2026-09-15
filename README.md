@@ -51,6 +51,8 @@ src/
 ├── domain/
 │   └── yarn/
 │       ├── categories.ts
+│       ├── classification.ts
+│       ├── conversions.ts
 │       ├── converters.test.ts
 │       ├── converters.ts
 │       └── types.ts
@@ -85,8 +87,10 @@ A tela inicial permite:
 ## Atenção sobre a classificação
 
 As faixas de categorias em `src/domain/yarn/categories.ts` são uma heurística
-operacional validada para o MVP, não uma equivalência normativa. O critério,
-as fontes e os limites da tabela estão em
+operacional validada para o MVP, não uma equivalência normativa. O arquivo
+separa dados padronizados CYC de aproximações do produto e armazena apenas
+metros por 100 g; as faixas TEX são derivadas pela fórmula. O critério, as
+fontes e os limites da tabela estão em
 [`docs/tabela-categorias.md`](./docs/tabela-categorias.md). Ainda é necessário
 calibrá-la com uma amostra de fios brasileiros reais antes de recomendações
 comerciais.

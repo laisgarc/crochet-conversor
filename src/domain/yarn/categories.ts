@@ -1,84 +1,121 @@
 import type { YarnCategory } from './types'
 
 /**
- * Faixas operacionais aproximadas do produto, em ordem do fio mais fino para
- * o mais grosso. O CYC padroniza nomes, números e gauge, mas não m/100 g ou TEX.
- * O critério e as fontes da heurística estão em docs/tabela-categorias.md.
+ * Fonte única de categorias, em ordem do fio mais fino para o mais grosso.
+ *
+ * `standard` reúne dados externos padronizados pelo CYC. `projectEstimates`
+ * reúne as aproximações operacionais do Crochê Conversor. O CYC não define
+ * faixas de m/100 g ou TEX; TEX é sempre derivado da faixa de m/100 g.
  */
-export const yarnCategories: YarnCategory[] = [
+export const yarnCategories = [
   {
     id: 'lace',
-    cyc: 0,
-    name: 'Lace',
-    aliases: [],
-    minMetersPer100g: 600,
-    maxMetersPer100g: null,
-    crochetHooks: [
-      { label: 'aço', minMm: 1.4, maxMm: 1.6 },
-      { label: 'comum', minMm: 2.25, maxMm: 2.25 },
-    ],
+    standard: {
+      cycNumber: 0,
+      standardName: 'Lace',
+      displayName: 'Lace',
+      aliases: [],
+      crochet: {
+        hooks: [
+          { type: 'steel', minMm: 1.4, maxMm: 1.6 },
+          { type: 'regular', minMm: 2.25, maxMm: 2.25 },
+        ],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 600, max: null } },
   },
   {
-    id: 'fingering',
-    cyc: 1,
-    name: 'Fingering / Sock',
-    aliases: ['Super Fine'],
-    minMetersPer100g: 360,
-    maxMetersPer100g: 600,
-    crochetHooks: [{ minMm: 2.25, maxMm: 3.5 }],
+    id: 'super-fine',
+    standard: {
+      cycNumber: 1,
+      standardName: 'Super Fine',
+      displayName: 'Fingering / Sock',
+      aliases: ['Fingering', 'Sock'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 2.25, maxMm: 3.5 }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 360, max: 600 } },
   },
   {
-    id: 'sport',
-    cyc: 2,
-    name: 'Sport / Baby',
-    aliases: ['Fine'],
-    minMetersPer100g: 280,
-    maxMetersPer100g: 360,
-    crochetHooks: [{ minMm: 3.5, maxMm: 4.5 }],
+    id: 'fine',
+    standard: {
+      cycNumber: 2,
+      standardName: 'Fine',
+      displayName: 'Sport / Baby',
+      aliases: ['Sport', 'Baby'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 3.5, maxMm: 4.5 }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 280, max: 360 } },
   },
   {
-    id: 'dk',
-    cyc: 3,
-    name: 'DK / Light',
-    aliases: ['Light Worsted'],
-    minMetersPer100g: 200,
-    maxMetersPer100g: 280,
-    crochetHooks: [{ minMm: 4.5, maxMm: 5.5 }],
+    id: 'light',
+    standard: {
+      cycNumber: 3,
+      standardName: 'Light',
+      displayName: 'DK / Light',
+      aliases: ['DK', 'Light Worsted'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 4.5, maxMm: 5.5 }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 200, max: 280 } },
   },
   {
-    id: 'worsted',
-    cyc: 4,
-    name: 'Worsted / Aran / Medium',
-    aliases: ['Afghan'],
-    minMetersPer100g: 140,
-    maxMetersPer100g: 200,
-    crochetHooks: [{ minMm: 5.5, maxMm: 6.5 }],
+    id: 'medium',
+    standard: {
+      cycNumber: 4,
+      standardName: 'Medium',
+      displayName: 'Worsted / Aran / Medium',
+      aliases: ['Worsted', 'Aran', 'Afghan'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 5.5, maxMm: 6.5 }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 140, max: 200 } },
   },
   {
     id: 'bulky',
-    cyc: 5,
-    name: 'Bulky / Chunky',
-    aliases: ['Craft', 'Rug'],
-    minMetersPer100g: 100,
-    maxMetersPer100g: 140,
-    crochetHooks: [{ minMm: 6.5, maxMm: 9 }],
+    standard: {
+      cycNumber: 5,
+      standardName: 'Bulky',
+      displayName: 'Bulky / Chunky',
+      aliases: ['Chunky', 'Craft', 'Rug'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 6.5, maxMm: 9 }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 100, max: 140 } },
   },
   {
     id: 'super-bulky',
-    cyc: 6,
-    name: 'Super Bulky',
-    aliases: ['Super Chunky', 'Roving'],
-    minMetersPer100g: 40,
-    maxMetersPer100g: 100,
-    crochetHooks: [{ minMm: 9, maxMm: 15 }],
+    standard: {
+      cycNumber: 6,
+      standardName: 'Super Bulky',
+      displayName: 'Super Bulky',
+      aliases: ['Super Chunky', 'Roving'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 9, maxMm: 15 }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 40, max: 100 } },
   },
   {
     id: 'jumbo',
-    cyc: 7,
-    name: 'Jumbo',
-    aliases: ['Roving'],
-    minMetersPer100g: 0,
-    maxMetersPer100g: 40,
-    crochetHooks: [{ minMm: 15, maxMm: null }],
+    standard: {
+      cycNumber: 7,
+      standardName: 'Jumbo',
+      displayName: 'Jumbo',
+      aliases: ['Roving'],
+      crochet: {
+        hooks: [{ type: 'regular', minMm: 15, maxMm: null }],
+      },
+    },
+    projectEstimates: { metersPer100g: { min: 0, max: 40 } },
   },
-]
+] as const satisfies readonly YarnCategory[]
+
+/** Aproximação própria do produto, não publicada pelo CYC. */
+export const transitionMarginRatio = 0.05

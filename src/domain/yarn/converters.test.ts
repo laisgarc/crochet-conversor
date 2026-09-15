@@ -1,116 +1,188 @@
 import { describe, expect, it } from 'vitest'
+import { yarnCategories } from './categories'
 import {
   categoryToApproximateRange,
   classifyYarn,
+  findYarnCategories,
+  findYarnCategory,
+  getTexRangeFromMetersRange,
+  metersPer100gToTex,
   resultFromLabel,
   resultFromTex,
   texToMetersPer100g,
+  yarnLabelToMetersPer100g,
   yarnLabelToTex,
 } from './converters'
-import { yarnCategories } from './categories'
+import type { YarnCategoryId } from './types'
 
-describe('conversões de fio', () => {
-  it('converte TEX 400 em 250 m/100 g', () => {
+describe('conversões básicas', () => {
+  it('converte TEX e metros por 100 g nos dois sentidos', () => {
     expect(texToMetersPer100g(400)).toBe(250)
+    expect(metersPer100gToTex(250)).toBe(400)
+    expect(metersPer100gToTex(texToMetersPer100g(378))).toBeCloseTo(378)
   })
 
-  it('calcula TEX 400 para um novelo de 100 g e 250 m', () => {
+  it('normaliza peso e metragem da etiqueta', () => {
     expect(yarnLabelToTex(100, 250)).toBe(400)
-  })
-
-  it('classifica TEX 400 como DK / Light', () => {
-    expect(resultFromTex(400).category.name).toBe('DK / Light')
-  })
-
-  it('gera o mesmo resultado usando peso e metragem equivalentes', () => {
-    const result = resultFromLabel(100, 250)
-    expect(result.tex).toBe(400)
-    expect(result.metersPer100g).toBe(250)
-    expect(result.category.name).toBe('DK / Light')
-  })
-
-  it('sinaliza um valor próximo ao limite como zona de transição', () => {
-    const result = resultFromTex(100_000 / 205)
-
-    expect(result.category.id).toBe('dk')
-    expect(result.transitionCategories.map(({ id }) => id)).toContain('worsted')
-  })
-})
-
-describe('categoria internacional para faixa aproximada', () => {
-  it('converte DK / Light em faixas de m/100 g e TEX', () => {
-    const result = categoryToApproximateRange('dk')
-
-    expect(result.category.cyc).toBe(3)
-    expect(result.metersPer100g).toEqual({ min: 200, max: 280 })
-    expect(result.tex.min).toBeCloseTo(357.14, 2)
-    expect(result.tex.max).toBe(500)
-    expect(result.category.crochetHooks).toEqual([{ minMm: 4.5, maxMm: 5.5 }])
-    expect(result.transitionCategories.map(({ id }) => id)).toEqual([
-      'sport',
-      'worsted',
-    ])
-  })
-
-  it('mantém o limite fino de Lace aberto', () => {
-    const result = categoryToApproximateRange('lace')
-
-    expect(result.metersPer100g).toEqual({ min: 600, max: null })
-    expect(result.tex.min).toBeNull()
-    expect(result.tex.max).toBeCloseTo(166.67, 2)
-  })
-
-  it('mantém o limite grosso de Jumbo aberto', () => {
-    const result = categoryToApproximateRange('jumbo')
-
-    expect(result.metersPer100g).toEqual({ min: 0, max: 40 })
-    expect(result.tex.min).toBe(2500)
-    expect(result.tex.max).toBeNull()
+    expect(yarnLabelToMetersPer100g(50, 125)).toBe(250)
   })
 
   it.each([
-    ['fingering', 166.67, 277.78],
-    ['sport', 277.78, 357.14],
-    ['dk', 357.14, 500],
-    ['worsted', 500, 714.29],
-    ['bulky', 714.29, 1000],
-    ['super-bulky', 1000, 2500],
-  ] as const)('calcula a faixa TEX de %s pela mesma fonte de dados', (categoryId, minTex, maxTex) => {
-    const result = categoryToApproximateRange(categoryId)
-
-    expect(result.tex.min).toBeCloseTo(minTex, 2)
-    expect(result.tex.max).toBeCloseTo(maxTex, 2)
+    ['tex', () => texToMetersPer100g(0)],
+    ['metros por 100 g', () => metersPer100gToTex(Number.NaN)],
+    ['peso', () => yarnLabelToTex(-1, 100)],
+    ['metragem', () => yarnLabelToMetersPer100g(100, Number.POSITIVE_INFINITY)],
+  ])('rejeita %s inválido', (_field, conversion) => {
+    expect(conversion).toThrow()
   })
+})
 
-  it('mantém as recomendações de agulha CYC junto de todas as categorias', () => {
+describe('fonte única das categorias', () => {
+  it('usa os nomes padronizados CYC 0–7 em ordem', () => {
     expect(
-      yarnCategories.map(({ id, crochetHooks }) => [id, crochetHooks]),
+      yarnCategories.map(({ standard }) => [
+        standard.cycNumber,
+        standard.standardName,
+      ]),
     ).toEqual([
-      [
-        'lace',
-        [
-          { label: 'aço', minMm: 1.4, maxMm: 1.6 },
-          { label: 'comum', minMm: 2.25, maxMm: 2.25 },
-        ],
-      ],
-      ['fingering', [{ minMm: 2.25, maxMm: 3.5 }]],
-      ['sport', [{ minMm: 3.5, maxMm: 4.5 }]],
-      ['dk', [{ minMm: 4.5, maxMm: 5.5 }]],
-      ['worsted', [{ minMm: 5.5, maxMm: 6.5 }]],
-      ['bulky', [{ minMm: 6.5, maxMm: 9 }]],
-      ['super-bulky', [{ minMm: 9, maxMm: 15 }]],
-      ['jumbo', [{ minMm: 15, maxMm: null }]],
+      [0, 'Lace'],
+      [1, 'Super Fine'],
+      [2, 'Fine'],
+      [3, 'Light'],
+      [4, 'Medium'],
+      [5, 'Bulky'],
+      [6, 'Super Bulky'],
+      [7, 'Jumbo'],
     ])
   })
 
-  it.each(yarnCategories)('reutiliza a faixa de $name na classificação direta', (category) => {
-    const representativeMeters =
-      category.maxMetersPer100g === null
-        ? category.minMetersPer100g * 1.25
-        : category.minMetersPer100g === 0
-          ? category.maxMetersPer100g / 2
-          : (category.minMetersPer100g + category.maxMetersPer100g) / 2
+  it.each([
+    ['Lace', 'lace'],
+    ['fingering', 'super-fine'],
+    [' SOCK ', 'super-fine'],
+    ['Baby', 'fine'],
+    ['DK', 'light'],
+    ['Light Worsted', 'light'],
+    ['Worsted', 'medium'],
+    ['Aran', 'medium'],
+    ['Chunky', 'bulky'],
+    ['Super Chunky', 'super-bulky'],
+    ['Jumbo', 'jumbo'],
+  ] as const)('resolve o nome ou alias %s', (alias, categoryId) => {
+    expect(findYarnCategory(alias)?.id).toBe(categoryId)
+  })
 
-    expect(classifyYarn(representativeMeters).id).toBe(category.id)
+  it('preserva o alias Roving compartilhado pelas categorias CYC 6 e 7', () => {
+    expect(findYarnCategories('Roving').map(({ id }) => id)).toEqual([
+      'super-bulky',
+      'jumbo',
+    ])
+  })
+
+  it('mantém as recomendações de agulha junto dos dados CYC', () => {
+    expect(
+      yarnCategories.map(({ standard }) => standard.crochet.hooks),
+    ).toEqual([
+      [
+        { type: 'steel', minMm: 1.4, maxMm: 1.6 },
+        { type: 'regular', minMm: 2.25, maxMm: 2.25 },
+      ],
+      [{ type: 'regular', minMm: 2.25, maxMm: 3.5 }],
+      [{ type: 'regular', minMm: 3.5, maxMm: 4.5 }],
+      [{ type: 'regular', minMm: 4.5, maxMm: 5.5 }],
+      [{ type: 'regular', minMm: 5.5, maxMm: 6.5 }],
+      [{ type: 'regular', minMm: 6.5, maxMm: 9 }],
+      [{ type: 'regular', minMm: 9, maxMm: 15 }],
+      [{ type: 'regular', minMm: 15, maxMm: null }],
+    ])
+  })
+})
+
+describe('faixas derivadas', () => {
+  it.each(yarnCategories)(
+    'deriva a faixa TEX de $standard.displayName invertendo os limites em metros',
+    (category) => {
+      const metersRange = category.projectEstimates.metersPer100g
+      const result = categoryToApproximateRange(category.id)
+
+      expect(result.metersPer100g).toBe(metersRange)
+      expect(result.tex.min).toBe(
+        metersRange.max === null ? null : 100_000 / metersRange.max,
+      )
+      expect(result.tex.max).toBe(
+        metersRange.min === 0 ? null : 100_000 / metersRange.min,
+      )
+    },
+  )
+
+  it('mantém os extremos abertos de Lace e Jumbo', () => {
+    expect(categoryToApproximateRange('lace').tex).toEqual({
+      min: null,
+      max: 100_000 / 600,
+    })
+    expect(categoryToApproximateRange('jumbo').tex).toEqual({
+      min: 100_000 / 40,
+      max: null,
+    })
+  })
+
+  it.each([
+    { min: null, max: 100 },
+    { min: -1, max: 100 },
+    { min: 100, max: 100 },
+    { min: 100, max: 90 },
+  ])('rejeita a faixa inválida $min–$max', (range) => {
+    expect(() => getTexRangeFromMetersRange(range)).toThrow(
+      'Faixa de metros por 100 g inválida.',
+    )
+  })
+})
+
+describe('classificação e fluxos funcionais', () => {
+  it('gera o mesmo resultado com TEX e etiqueta equivalentes', () => {
+    const fromTex = resultFromTex(400)
+    const fromLabel = resultFromLabel(100, 250)
+
+    expect(fromTex.category.id).toBe('light')
+    expect(fromLabel).toEqual(fromTex)
+    expect(fromTex.category.standard.displayName).toBe('DK / Light')
+  })
+
+  it.each([
+    [600, 'lace'],
+    [599.99, 'super-fine'],
+    [360, 'super-fine'],
+    [359.99, 'fine'],
+    [280, 'fine'],
+    [279.99, 'light'],
+    [200, 'light'],
+    [199.99, 'medium'],
+    [140, 'medium'],
+    [139.99, 'bulky'],
+    [100, 'bulky'],
+    [99.99, 'super-bulky'],
+    [40, 'super-bulky'],
+    [39.99, 'jumbo'],
+  ] as const)('classifica o limite %s em %s', (meters, categoryId) => {
+    expect(classifyYarn(meters).id).toBe(categoryId)
+  })
+
+  it('sinaliza valores próximos de uma borda como transição', () => {
+    expect(resultFromTex(100_000 / 205).transitionCategories.map(({ id }) => id)).toContain(
+      'medium',
+    )
+  })
+
+  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+    'rejeita classificação inválida para %s',
+    (meters) => {
+      expect(() => classifyYarn(meters)).toThrow()
+    },
+  )
+
+  it('rejeita uma categoria inexistente', () => {
+    expect(() => categoryToApproximateRange('unknown' as YarnCategoryId)).toThrow(
+      'Selecione uma categoria de fio.',
+    )
   })
 })

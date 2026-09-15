@@ -269,7 +269,8 @@ export function YarnConverter() {
               <option value="">Escolha uma categoria</option>
               {yarnCategories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name} — CYC {category.cyc}
+                  {category.standard.displayName} — CYC{' '}
+                  {category.standard.cycNumber}
                 </option>
               ))}
             </select>

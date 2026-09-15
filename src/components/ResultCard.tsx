@@ -1,6 +1,6 @@
 import type {
-  ApproximateRange,
-  CrochetHookRecommendation,
+  HookRecommendation,
+  Range,
   YarnCategory,
   YarnCategoryRangeResult,
   YarnResult,
@@ -17,11 +17,13 @@ const decimalFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 2,
 })
 
-function categoryList(categories: YarnCategory[]) {
-  return categories.map(({ name }) => name).join(' ou ')
+function categoryList(categories: readonly YarnCategory[]) {
+  return categories
+    .map(({ standard }) => standard.displayName)
+    .join(' ou ')
 }
 
-function formatRange(range: ApproximateRange) {
+function formatRange(range: Range) {
   if (range.min === null || range.min === 0) {
     return `até ${Math.round(range.max ?? 0)}`
   }
@@ -33,8 +35,12 @@ function formatRange(range: ApproximateRange) {
   return `${Math.round(range.min)}–${Math.round(range.max)}`
 }
 
-function formatHookRange(recommendation: CrochetHookRecommendation) {
-  const prefix = recommendation.label ? `${recommendation.label} ` : ''
+function formatHookRange(
+  recommendation: HookRecommendation,
+  showType: boolean,
+) {
+  const typeLabels = { steel: 'aço', regular: 'comum' } as const
+  const prefix = showType ? `${typeLabels[recommendation.type]} ` : ''
 
   if (recommendation.maxMm === null) {
     return `${prefix}${decimalFormatter.format(recommendation.minMm)} mm ou mais`
@@ -48,11 +54,13 @@ function formatHookRange(recommendation: CrochetHookRecommendation) {
 }
 
 function HookRecommendation({ category }: { category: YarnCategory }) {
+  const hooks = category.standard.crochet.hooks
+
   return (
     <div className="rounded-2xl bg-brand-peach p-4 sm:col-span-2">
       <dt className="text-sm font-bold">Agulha de crochê indicada</dt>
       <dd className="mt-1 text-xl font-black">
-        {category.crochetHooks.map(formatHookRange).join(' ou ')}
+        {hooks.map((hook) => formatHookRange(hook, hooks.length > 1)).join(' ou ')}
       </dd>
       <dd className="mt-1 text-sm">Referência CYC; ajuste para alcançar o gauge da receita.</dd>
     </div>
@@ -83,9 +91,12 @@ export function ResultCard(props: ResultCardProps) {
           id="resultado-faixa-titulo"
           className="mt-2 text-4xl font-black tracking-tight sm:text-5xl"
         >
-          {category.name}
+          {category.standard.displayName}
         </h2>
-        <p className="mt-2 text-lg font-bold">Categoria CYC {category.cyc}</p>
+        <p className="mt-2 text-lg font-bold">
+          Categoria CYC {category.standard.cycNumber} —{' '}
+          {category.standard.standardName}
+        </p>
 
         <dl className="mt-6 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl bg-brand-cream p-4">
@@ -128,9 +139,12 @@ export function ResultCard(props: ResultCardProps) {
         id="resultado-titulo"
         className="mt-2 text-4xl font-black tracking-tight sm:text-5xl"
       >
-        {result.category.name}
+        {result.category.standard.displayName}
       </h2>
-      <p className="mt-2 text-lg font-bold">Categoria CYC {result.category.cyc}</p>
+      <p className="mt-2 text-lg font-bold">
+        Categoria CYC {result.category.standard.cycNumber} —{' '}
+        {result.category.standard.standardName}
+      </p>
 
       <dl className="mt-6 grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl bg-brand-cream p-4">

@@ -1,44 +1,55 @@
 export type YarnCategoryId =
   | 'lace'
-  | 'fingering'
-  | 'sport'
-  | 'dk'
-  | 'worsted'
+  | 'super-fine'
+  | 'fine'
+  | 'light'
+  | 'medium'
   | 'bulky'
   | 'super-bulky'
   | 'jumbo'
 
-export type CrochetHookRecommendation = {
-  label?: 'aço' | 'comum'
+export type CycNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+
+export type Range = Readonly<{
+  min: number | null
+  max: number | null
+}>
+
+export type HookRecommendation = Readonly<{
+  type: 'steel' | 'regular'
   minMm: number
   maxMm: number | null
-}
+}>
 
-export type YarnCategory = {
+export type CycCategoryStandard = Readonly<{
+  cycNumber: CycNumber
+  standardName: string
+  displayName: string
+  aliases: readonly string[]
+  crochet: Readonly<{
+    hooks: readonly HookRecommendation[]
+    gaugeStitchesPer10cm?: Range
+  }>
+}>
+
+export type YarnCategory = Readonly<{
   id: YarnCategoryId
-  cyc: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
-  name: string
-  aliases: string[]
-  minMetersPer100g: number
-  maxMetersPer100g: number | null
-  crochetHooks: CrochetHookRecommendation[]
-}
+  standard: CycCategoryStandard
+  projectEstimates: Readonly<{
+    metersPer100g: Range
+  }>
+}>
 
-export type YarnResult = {
+export type YarnResult = Readonly<{
   tex: number
   metersPer100g: number
   category: YarnCategory
-  transitionCategories: YarnCategory[]
-}
+  transitionCategories: readonly YarnCategory[]
+}>
 
-export type ApproximateRange = {
-  min: number | null
-  max: number | null
-}
-
-export type YarnCategoryRangeResult = {
+export type YarnCategoryRangeResult = Readonly<{
   category: YarnCategory
-  metersPer100g: ApproximateRange
-  tex: ApproximateRange
-  transitionCategories: YarnCategory[]
-}
+  metersPer100g: Range
+  tex: Range
+  transitionCategories: readonly YarnCategory[]
+}>
