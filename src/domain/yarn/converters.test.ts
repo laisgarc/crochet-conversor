@@ -45,6 +45,7 @@ describe('categoria internacional para faixa aproximada', () => {
     expect(result.metersPer100g).toEqual({ min: 200, max: 280 })
     expect(result.tex.min).toBeCloseTo(357.14, 2)
     expect(result.tex.max).toBe(500)
+    expect(result.category.crochetHooks).toEqual([{ minMm: 4.5, maxMm: 5.5 }])
     expect(result.transitionCategories.map(({ id }) => id)).toEqual([
       'sport',
       'worsted',
@@ -79,6 +80,27 @@ describe('categoria internacional para faixa aproximada', () => {
 
     expect(result.tex.min).toBeCloseTo(minTex, 2)
     expect(result.tex.max).toBeCloseTo(maxTex, 2)
+  })
+
+  it('mantém as recomendações de agulha CYC junto de todas as categorias', () => {
+    expect(
+      yarnCategories.map(({ id, crochetHooks }) => [id, crochetHooks]),
+    ).toEqual([
+      [
+        'lace',
+        [
+          { label: 'aço', minMm: 1.4, maxMm: 1.6 },
+          { label: 'comum', minMm: 2.25, maxMm: 2.25 },
+        ],
+      ],
+      ['fingering', [{ minMm: 2.25, maxMm: 3.5 }]],
+      ['sport', [{ minMm: 3.5, maxMm: 4.5 }]],
+      ['dk', [{ minMm: 4.5, maxMm: 5.5 }]],
+      ['worsted', [{ minMm: 5.5, maxMm: 6.5 }]],
+      ['bulky', [{ minMm: 6.5, maxMm: 9 }]],
+      ['super-bulky', [{ minMm: 9, maxMm: 15 }]],
+      ['jumbo', [{ minMm: 15, maxMm: null }]],
+    ])
   })
 
   it.each(yarnCategories)('reutiliza a faixa de $name na classificação direta', (category) => {

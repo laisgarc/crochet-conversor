@@ -8,6 +8,12 @@ export type YarnCategoryId =
   | 'super-bulky'
   | 'jumbo'
 
+export type CrochetHookRecommendation = {
+  label?: 'aço' | 'comum'
+  minMm: number
+  maxMm: number | null
+}
+
 export type YarnCategory = {
   id: YarnCategoryId
   cyc: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -15,6 +21,7 @@ export type YarnCategory = {
   aliases: string[]
   minMetersPer100g: number
   maxMetersPer100g: number | null
+  crochetHooks: CrochetHookRecommendation[]
 }
 
 export type YarnResult = {

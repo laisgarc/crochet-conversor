@@ -77,6 +77,7 @@ A tela inicial permite:
 - obter uma categoria internacional aproximada;
 - selecionar uma categoria internacional e consultar faixas aproximadas de TEX
   e metros por 100 g;
+- consultar a faixa de agulha de crochê recomendada pelo CYC para o resultado;
 - visualizar CYC, TEX e metros por 100 g no resultado;
 - identificar zonas de transição e categorias adjacentes;
 - alternar entre modos usando controles acessíveis por teclado.

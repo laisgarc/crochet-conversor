@@ -1,5 +1,6 @@
 import type {
   ApproximateRange,
+  CrochetHookRecommendation,
   YarnCategory,
   YarnCategoryRangeResult,
   YarnResult,
@@ -11,6 +12,10 @@ type ResultCardProps =
 
 const resultCardClass =
   'rounded-[2rem] border-2 border-brand-charcoal bg-brand-green p-6 shadow-[6px_6px_0_0_#2D2D2D] sm:p-8'
+
+const decimalFormatter = new Intl.NumberFormat('pt-BR', {
+  maximumFractionDigits: 2,
+})
 
 function categoryList(categories: YarnCategory[]) {
   return categories.map(({ name }) => name).join(' ou ')
@@ -26,6 +31,32 @@ function formatRange(range: ApproximateRange) {
   }
 
   return `${Math.round(range.min)}–${Math.round(range.max)}`
+}
+
+function formatHookRange(recommendation: CrochetHookRecommendation) {
+  const prefix = recommendation.label ? `${recommendation.label} ` : ''
+
+  if (recommendation.maxMm === null) {
+    return `${prefix}${decimalFormatter.format(recommendation.minMm)} mm ou mais`
+  }
+
+  if (recommendation.minMm === recommendation.maxMm) {
+    return `${prefix}${decimalFormatter.format(recommendation.minMm)} mm`
+  }
+
+  return `${prefix}${decimalFormatter.format(recommendation.minMm)}–${decimalFormatter.format(recommendation.maxMm)} mm`
+}
+
+function HookRecommendation({ category }: { category: YarnCategory }) {
+  return (
+    <div className="rounded-2xl bg-brand-peach p-4 sm:col-span-2">
+      <dt className="text-sm font-bold">Agulha de crochê indicada</dt>
+      <dd className="mt-1 text-xl font-black">
+        {category.crochetHooks.map(formatHookRange).join(' ou ')}
+      </dd>
+      <dd className="mt-1 text-sm">Referência CYC; ajuste para alcançar o gauge da receita.</dd>
+    </div>
+  )
 }
 
 function EstimateNotice() {
@@ -69,6 +100,7 @@ export function ResultCard(props: ResultCardProps) {
               {formatRange(metersPer100g)} m
             </dd>
           </div>
+          <HookRecommendation category={category} />
         </dl>
 
         <div className="mt-4 rounded-2xl border-2 border-brand-charcoal bg-brand-lilac p-4">
@@ -111,6 +143,7 @@ export function ResultCard(props: ResultCardProps) {
             {Math.round(result.metersPer100g)} m
           </dd>
         </div>
+        <HookRecommendation category={result.category} />
       </dl>
 
       {result.transitionCategories.length > 0 ? (
